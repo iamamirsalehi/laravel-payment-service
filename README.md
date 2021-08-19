@@ -99,7 +99,7 @@ class PaymentService
 ```
 
 If you want to use Payment you have to start from ``PaymentService`` class. In This class we defined our different provider names as constant, Like ``IDPAY`` or ``Vandar``. <br>
-In the construct of class we want two parameters, First one if ``$dataRequest`` and the second one is the gatewat type. <br>
+In the construct of class we have two parameters, First one if ``$dataRequest`` and the second one is the gatewat type. <br>
 #### What is ``$dataRequest`` anyway?
 In the example of this class you will see:
 ```php
@@ -108,7 +108,9 @@ use App\Services\Payment\Requests\PayRequest as PaymentServicePayRequest;
 $payRequest = new PaymentServicePayRequest((int)$data['amount'], $bankAccount, $data['user']);
 (new PaymentService($payRequest, PaymentService::IDPAY))->sendToGateway();
 ```
-If you noticed the constructor the first paramter is type of ``PayRequest`` or ``VerifyRequest``, These two class has the necessary data that we need to use in every single provider, Like ``amount``, the actual ``user``, ``user's bank account``, etc. <br>
+If you noticed the constructor the first paramter is type of ``PayRequest`` or ``VerifyRequest``, These two class has the necessary data that we need to use in every single provider, Like ``amount``, the actual ``user``, ``user's bank account``, etc to pay or verify!<br>
 
-<br>
-<br>
+<hr>
+
+The ``findGateway`` method in the ``PaymentService`` class returns the object of the provider that you passed in the second parameter of the constructor. <br>
+As we defined our interfaces we are sure that both of them has at least the ``Pay`` method, So in the ``sendToGateway`` method we call the ``pay`` method on the object that ``sendToGateway`` returns to us and we pass the ``$dataReqeust`` as well, Ultimately the user will be redirected to payment page. <br>
