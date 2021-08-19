@@ -213,3 +213,5 @@ class PaymentController extends Controller
     }
 }
 ```
+
+The chain of responsibility explanation will be added soon.
