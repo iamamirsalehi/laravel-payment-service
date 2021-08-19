@@ -85,7 +85,7 @@ class PaymentController extends Controller
             $paymentExistanceHandler->setNext($bankAccountVerificationHandler);
             $paymentExistanceHandler->handle($data);
 
-            # Verifing user payment
+            # Verifying user payment
             $payment = $this->paymentRepository->findBy(['factor_number' => $data['order_id']], null, 'first');
 
             $verifyRequest = new VerifyRequest($payment, $data['order_id'], $data['card_no'], $data['id']);

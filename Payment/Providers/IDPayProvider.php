@@ -13,7 +13,6 @@ use App\Services\Payment\PaymentChain\IDPayChain\Exceptions\PaymentFailedExcepti
 use App\Services\Payment\Requests\PayRequest;
 use App\Services\Payment\Requests\VerifyRequest;
 use App\Utilities\API\Money;
-use App\Utilities\Log;
 use Iamamirsalehi\LaravelBalance\Services\Balance\BalanceService;
 use Illuminate\Support\Str;
 
@@ -37,13 +36,6 @@ class IDPayProvider implements PayableInterface, VerifiableInterface
         $response = $this->checkPayProccess(config('services.id_pay.api_key'), $params);
 
         if ($response['httpCode'] != 201) {
-            Log::action([
-                'type' => 'warning',
-                'user_id' => $dataRequest->getUser()->id,
-                'method_address' => 'App\Services\Payment\Providers\IDPayProvider::pay',
-                'action' => 'user (ID=' . $dataRequest->getUser()->id . ') with amount of ' . $dataRequest->getAmount() . 'IRR pay and error (' . $response['result']->error_message . ')',
-            ]);
-
             throw new CouldNotGoToGatwayException($response['result']->error_message);
         }
 
@@ -55,22 +47,8 @@ class IDPayProvider implements PayableInterface, VerifiableInterface
         ]);
 
         if (!$stored_payment) {
-            Log::action([
-                'type' => 'warning',
-                'user_id' => $dataRequest->getUser()->id,
-                'method_address' => 'App\Services\Payment\Providers\IDPayProvider::pay',
-                'action' => 'user (ID=' . $dataRequest->getUser()->id . ') with amount of ' . $dataRequest->getAmount() . 'IRR pay, Could not send to gateway because Payment could not be stored in database',
-            ]);
-
             throw new CouldNotGoToGatwayException('مشکلی در زمان ارسال به درگاه پرداخت به وجود آمد لطفا دوباره امتحان کنید');
         }
-
-        Log::action([
-            'type' => 'info',
-            'user_id' => $dataRequest->getUser()->id,
-            'method_address' => 'App\Services\Payment\Providers\IDPayProvider::pay',
-            'action' => 'user (ID=' . $dataRequest->getUser()->id . ') is ready to pay with amount of ' . $dataRequest->getAmount() . 'IRR',
-        ]);
 
         return redirect()->away($response['result']->link)->send();
     }
@@ -150,12 +128,6 @@ class IDPayProvider implements PayableInterface, VerifiableInterface
                 $eloquentRepo->commit();
             } catch (\Exception $e) {
                 $eloquentRepo->rollback();
-                Log::action([
-                    'type' => 'error',
-                    'user_id' => $verified_payment->user_id,
-                    'method_address' => 'App\Http\Controllers\Admin\Balance\PaymentController::verify',
-                    'action' => 'deposit of the user with(ID=' . $verified_payment->user_id . ') with amount of (' . $verified_payment->amount . 'IRR) failed in payment',
-                ]);
 
                 return redirect()->route('payment.callback.form')->with('failed', $e->getMessage());
             }
@@ -166,13 +138,6 @@ class IDPayProvider implements PayableInterface, VerifiableInterface
                 'user_id' => (int)$verified_payment->user_id,
                 'coin_id' => Money::getIRR()->id,
                 'type' => $requestedCoinRepo::DEPOSIT,
-            ]);
-
-            Log::action([
-                'type' => 'info',
-                'user_id' => $verified_payment->user_id,
-                'method_address' => 'App\Http\Controllers\Admin\Balance\PaymentController::verify',
-                'action' => 'the amount of  (' . $verified_payment->amount . 'IRR) is deposited for user with (ID=' . $verified_payment->user_id . ')',
             ]);
         }
 
