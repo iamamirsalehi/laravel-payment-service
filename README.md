@@ -35,7 +35,29 @@ interface VerifiableInterface
     public function verify(VerifyRequest $verifyRequest);
 }
 ```
+So every provider that wants to be added to this service has to implement at least the Payable interface, Like:
+```php
+namespace App\Services\Payment\Providers;
 
+use App\Services\Payment\Contracts\PayableInterface;
+use App\Services\Payment\Contracts\VerifiableInterface;
+use App\Services\Payment\Requests\PayRequest;
+use App\Services\Payment\Requests\VerifyRequest;
+
+class VandarProvider implements PayableInterface, VerifiableInterface
+{
+
+    public function pay(PayRequest $dataRequest)
+    {
+        // TODO: Implement pay() method.
+    }
+
+    public function verify(VerifyRequest $verifyRequest)
+    {
+        // TODO: Implement verify() method.
+    }
+}
+```
 
 ### Let's find out How payment service class works
 
