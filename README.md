@@ -114,3 +114,15 @@ If you noticed the constructor the first paramter is type of ``PayRequest`` or `
 
 The ``findGateway`` method in the ``PaymentService`` class returns the object of the provider that you passed in the second parameter of the constructor. <br>
 As we defined our interfaces we are sure that both of them has at least the ``Pay`` method, So in the ``sendToGateway`` method we call the ``pay`` method on the object that ``sendToGateway`` returns to us and we pass the ``$dataReqeust`` as well, Ultimately the user will be redirected to payment page. <br>
+
+### What happens when the user come back from payment page?
+In this case users get back to ``verify`` method from payment page to the route that you given as ``callback`` route. Let's find out ``verify`` <br>
+
+```php
+use App\Services\Payment\Requests\VerifyRequest;
+
+$verifyRequest = new VerifyRequest($payment, $data['order_id'], $data['card_no'], $data['id']);
+$verificationData = (new PaymentService($verifyRequest, PaymentService::IDPAY))->verify();
+```
+In the verify method we just need to do the same stuff that we've done in the above section, But we need to use ``VerifyRequest`` class instedOf ``PayReuqest`` because in this case we want to verify the payment. <br>
+For verifying the payment we need to pass the data to ``VerifyRequest`` and pass it to ``PaymentService`` and finially call the ``Verify`` method of the ``PaymentService`` class.
