@@ -31,7 +31,6 @@ class IDPayProvider implements PayableInterface, VerifiableInterface
             'order_id' => $factor_number,
             'amount' => $dataRequest->getAmount(),
             'name' => $dataRequest->getUser()->full_name,
-//            'callback' => 'https://api-test.tethersale.com/api/v1/payment/callback',
             'callback' => route("payment.callback"),
         ];
 
