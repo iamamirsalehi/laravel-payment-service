@@ -95,11 +95,6 @@ class PaymentController extends Controller
             return redirect()->route('payment.callback.form')->with('failed', $e->getMessage());
         }
 
-        /* alert notification */
-        $notification_alert_data = $this->prepareDataForSendAlertNotification($verificationData['user_id'], null, 'واریز تومانی شما به مبلغ ' . number_format((int)$verificationData['amount'] / 10) . ' با موفقیت انجام شد', 'واریز تومانی');
-        $notification_service = new NotificationService('alert', $notification_alert_data);
-        $notification_service->perform();
-
         return redirect()->route('payment.callback.form')->with('success', 'پرداخت با موفقیت انجام شد');
     }
 
