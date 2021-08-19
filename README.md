@@ -8,6 +8,34 @@ All you need to do is copy the ``payment`` folder and paste it in App directory 
 
 If you wanna see the example ensure that you checked the ``example`` directory in this repository, It gives you an example of usage in ``PaymentController``.
 <br>
+The pattern we are using is [Strategy](https://refactoring.guru/design-patterns/strategy) that is one of the behavioral patterns. <br>
+First we need to define our interfaces to know what actually we will face in this service, We all know that every single provider has a ``pay`` method becuase it needs to be paied but some of them has ``verify`` method because all the payment are not verifiable, Like offline transactions. <br>
+So we have to define two different interfaces called ``Payable`` and ``Verifiable`` (These interfaces are in ``Payment/Contracts``).
+
+#### Payable interface
+```php
+namespace App\Services\Payment\Contracts;
+
+use App\Services\Payment\Requests\PayRequest;
+
+interface PayableInterface
+{
+    public function pay(PayRequest $dataRequest);
+}
+```
+
+#### Verifiable interface
+```php
+namespace App\Services\Payment\Contracts;
+
+use App\Services\Payment\Requests\VerifyRequest;
+
+interface VerifiableInterface
+{
+    public function verify(VerifyRequest $verifyRequest);
+}
+```
+
 
 ### Let's find out How payment service class works
 
@@ -48,5 +76,17 @@ class PaymentService
 
 ```
 
-If you want to use Payment you have to start from ``PaymentService`` class. <br>
-In This class we defined our different provider names as constant, Like ``IDPAY`` or ``Vandar``
+If you want to use Payment you have to start from ``PaymentService`` class. In This class we defined our different provider names as constant, Like ``IDPAY`` or ``Vandar``. <br>
+In the construct of class we want two parameters, First one if ``$dataRequest`` and the second one is the gatewat type. <br>
+#### What is ``$dataRequest`` anyway?
+In the example of this class you will see:
+```php
+use App\Services\Payment\Requests\PayRequest as PaymentServicePayRequest;
+
+$payRequest = new PaymentServicePayRequest((int)$data['amount'], $bankAccount, $data['user']);
+(new PaymentService($payRequest, PaymentService::IDPAY))->sendToGateway();
+```
+If you noticed the constructor the first paramter is type of ``PayRequest`` or ``VerifyRequest``, These two class has the necessary data that we need to use in every single provider, Like ``amount``, the actual ``user``, ``user's bank account``, etc. <br>
+
+<br>
+<br>
